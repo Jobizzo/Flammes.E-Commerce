@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Owner — Flammes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="api.js"></script>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,sans-serif;}
+        :root{--primary:#FF6B35;--success:#00B42A;--warning:#FF7D00;--danger:#F53F3F;--bg-main:#12121F;--bg-card:#1E1E2F;--border:#2D2D44;--text-primary:#FFF;--text-secondary:#A0A0B8;--sidebar-width:260px;--radius:12px;}
+        body{background:var(--bg-main);color:var(--text-primary);min-height:100vh;}
+        .sidebar{position:fixed;top:0;left:0;width:100%;background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;z-index:999;}
+        .brand{display:flex;align-items:center;gap:10px;}
+        .brand-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#FF452B);display:flex;align-items:center;justify-content:center;font-weight:900;color:white;}
+        .sidebar-nav{position:fixed;top:60px;left:0;width:100%;height:calc(100vh - 60px);background:var(--bg-card);transform:translateX(-100%);transition:.3s;padding:20px;}
+        .sidebar-nav.open{transform:translateX(0);}
+        .sidebar-nav a{display:flex;align-items:center;gap:12px;padding:12px 14px;color:var(--text-secondary);text-decoration:none;border-radius:8px;margin-bottom:4px;}
+        .sidebar-nav a:hover,.sidebar-nav a.active{background:var(--border);color:var(--primary);}
+        .main{padding:70px 16px 40px;}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+        .stat-card{background:var(--bg-card);border-radius:var(--radius);padding:16px;border:1px solid var(--border);}
+        .stat-value{font-size:24px;font-weight:800;}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:20px;border:1px solid var(--border);margin-bottom:20px;}
+        table{width:100%;border-collapse:collapse;font-size:14px;}
+        th,td{padding:12px 8px;text-align:left;border-bottom:1px solid var(--border);}
+        th{color:var(--text-secondary);}
+        .btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-size:13px;}
+        .btn-primary{background:var(--primary);color:white;}
+        .btn-sm{padding:4px 10px;font-size:12px;}
+        .badge{padding:3px 8px;border-radius:10px;font-size:12px;}
+        .badge-online{background:rgba(0,180,42,0.15);color:var(--success);}
+        .badge-offline{background:rgba(160,160,184,0.15);color:var(--text-secondary);}
+        .badge-role{background:rgba(22,93,255,0.15);color:#4285F4;}
+        .danger{color:var(--danger);}
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:2000;}
+        .modal-content{background:var(--bg-card);border-radius:16px;padding:24px;max-width:420px;width:90%;border:1px solid var(--border);}
+        .role-option{padding:12px 16px;border:1px solid var(--border);border-radius:8px;margin:8px 0;cursor:pointer;transition:.2s;}
+        .role-option:hover,.role-option.selected{border-color:var(--primary);background:rgba(255,107,53,0.1);}
+        .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+        .tab{padding:8px 16px;border-radius:8px;background:transparent;border:none;color:var(--text-secondary);cursor:pointer;}
+        .tab.active{background:var(--primary);color:white;}
+        @media(min-width:768px){
+            .sidebar{width:var(--sidebar-width);height:100vh;flex-direction:column;align-items:flex-start;padding:20px;border-bottom:none;border-right:1px solid var(--border);}
+            .menu-toggle{display:none;}
+            .sidebar-nav{position:static;transform:none;width:100%;border:none;padding:0;margin-top:24px;}
+            .main{margin-left:var(--sidebar-width);padding:30px;}
+        }
+    </style>
+</head>
+<body>
+<script>protectRoute('owner');</script>
+
+    <aside class="sidebar">
+        <div class="brand"><div class="brand-logo">F</div><span style="font-weight:800;color:var(--primary)">FLAMMES</span></div>
+        <button class="menu-toggle" onclick="toggleSidebar()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-bars"></i></button>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="#" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#"><i class="fas fa-box"></i> Products</a>
+            <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="#"><i class="fas fa-paint-brush"></i> Branding & Theme</a>
+            <a href="#"><i class="fas fa-tags"></i> Discounts & Flash Sales</a>
+            <a href="#"><i class="fas fa-users-cog"></i> <b>All Users</b></a>
+            <a href="#"><i class="fas fa-cog"></i> Shop Settings</a>
+            <a href="#" class="danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <h1 style="font-size:24px;margin-bottom:4px;">🏪 Shop Owner Dashboard</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px;">Welcome, <span id="userEmail"></span> — Full Shop Control</p>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">0</div><div style="color:var(--text-secondary);font-size:13px;">Products</div></div>
+            <div class="stat-card"><div class="stat-value">0</div><div style="color:var(--text-secondary);font-size:13px;">Orders</div></div>
+            <div class="stat-card"><div class="stat-value">KSh 0</div><div style="color:var(--text-secondary);font-size:13px;">Revenue</div></div>
+            <div class="stat-card"><div class="stat-value" id="userCount">0</div><div style="color:var(--text-secondary);font-size:13px;">Total Users</div></div>
+        </div>
+
+        <!-- ALL USERS & PROMOTE PANEL -->
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                <h3><i class="fas fa-users"></i> All Users & Promote</h3>
+                <span style="color:var(--text-secondary);font-size:13px;">Promote Customers → Worker / Agent</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th><th>Name</th><th>Status</th><th>Last Login</th><th>Current Role</th><th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="allUsersTable">
+                    <tr><td colspan="6" style="text-align:center;color:var(--text-secondary);padding:30px;">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- ROLE ASSIGNMENT MODAL -->
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:16px;">Change User Role</h3>
+            <p style="color:var(--text-secondary);margin-bottom:16px;" id="modalUserEmail"></p>
+            <div id="roleOptions">
+                <div class="role-option" data-role="customer" onclick="selectRoleOption('customer')">🛒 Customer — Browse & buy</div>
+                <div class="role-option" data-role="worker" onclick="selectRoleOption('worker')">👷 Shop Worker — Orders & inventory</div>
+                <div class="role-option" data-role="agent" onclick="selectRoleOption('agent')">🤝 Sales Agent — Referrals & commissions</div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:24px;">
+                <button class="btn" style="background:var(--border);color:var(--text-primary);flex:1;" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="saveRole()">Save Role</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const auth = initUser();
+let selectedUserEmail = null, newRole = null;
+
+async function loadAllUsers(){
+    const table = document.getElementById('allUsersTable');
+    try{
+        const snap = await db.collection('users').get();
+        if(snap.empty){
+            table.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary);padding:30px;">No users yet</td></tr>';
+            document.getElementById('userCount').textContent = '0';
+            return;
+        }
+        document.getElementById('userCount').textContent = snap.size;
+        table.innerHTML = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            const isOnline = u.lastLogin && (Date.now() - (u.lastLogin?.toDate?.()?.getTime()||0)) < 5*60*1000;
+            table.innerHTML += `
+                <tr>
+                    <td>${u.email}</td>
+                    <td>${u.name||'—'}</td>
+                    <td><span class="badge ${isOnline?'badge-online':'badge-offline'}">${isOnline?'🟢 Online':'⚫ Offline'}</span></td>
+                    <td>${u.lastLogin ? new Date(u.lastLogin.toDate()).toLocaleString().substring(0,16) : '—'}</td>
+                    <td><span class="badge badge-role">${(u.role||'customer').toUpperCase()}</span></td>
+                    <td><button class="btn btn-primary btn-sm" onclick="openRoleModal('${u.email}','${u.role||'customer'}')">Change Role</button></td>
+                </tr>`;
+        });
+    }catch(e){table.innerHTML = `<tr><td colspan="6" style="color:var(--danger)">Error loading users</td></tr>`;}
+}
+loadAllUsers();
+
+function openRoleModal(email, currentRole){
+    selectedUserEmail = email; newRole = currentRole;
+    document.getElementById('modalUserEmail').textContent = `Promote / Change role for: ${email}`;
+    document.querySelectorAll('.role-option').forEach(el=>{
+        el.classList.toggle('selected', el.dataset.role === currentRole);
+    });
+    document.getElementById('roleModal').style.display = 'flex';
+}
+function selectRoleOption(role){
+    newRole = role;
+    document.querySelectorAll('.role-option').forEach(el=>{
+        el.classList.toggle('selected', el.dataset.role === role);
+    });
+}
+async function saveRole(){
+    if(!newRole || !selectedUserEmail) return;
+    await db.collection('users').doc(selectedUserEmail).set({
+        role: newRole,
+        roleAssignedAt: new Date(),
+        roleAssignedBy: auth.email
+    }, {merge:true});
+    closeModal(); loadAllUsers();
+    alert('✅ Role updated! User will see new dashboard on next login.');
+}
+function closeModal(){
+    document.getElementById('roleModal').style.display = 'none';
+    selectedUserEmail = newRole = null;
+}
+</script>
+</body>
+</html>
