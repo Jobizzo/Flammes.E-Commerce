@@ -13,6 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin — Flammes E-Commerce Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- 🔥 FIREBASE — Cloud Database Connection → LOADS FIRST! ✅ -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif; }
         :root {
@@ -75,6 +79,7 @@
         .main { padding-top: 70px; padding-left: 16px; padding-right: 16px; padding-bottom: 40px; }
         .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
         .page-title p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .cloud-badge { display: inline-flex; align-items: center; gap: 6px; color: var(--success); font-size: 13px; margin-left: 10px; }
         .stats-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;
         }
@@ -202,8 +207,8 @@
     </aside>
     <main class="main">
         <div class="page-title">
-            <h1>Super Admin Control Center 👑</h1>
-            <p>Full Platform Overview — Flammes E-Commerce</p>
+            <h1>Super Admin Control Center 👑 <span class="cloud-badge" id="cloudStatus" style="display:none;"><i class="fas fa-cloud"></i> Cloud Connected</span></h1>
+            <p>Full Platform Overview — Flammes E-Commerce ☁️</p>
         </div>
         <div class="stats-grid">
             <div class="stat-card">
@@ -255,7 +260,7 @@
             </div>
         </div>
         <div class="footer">
-            Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform v1.1
+            Powered by FLAMMES-TECH 🔥 + Firebase Cloud ☁️ | Flammes E-Commerce Platform v2.0
         </div>
     </main>
 
@@ -317,10 +322,84 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // 🔄 DATA MANAGEMENT SYSTEM
-        const STORAGE_KEY = 'flammes_shops_data';
+        // 🔥 FIREBASE CLOUD INITIALIZATION
+        let db = null;
+        const SHOPS_COLLECTION = 'shops';
+        const STORAGE_KEY = 'flammes_shops_data'; // Fallback localStorage
 
-        // Initialize sample data if empty
+        // Initialize Firebase & load data
+        async function initCloud() {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                try {
+                    db = firebase.firestore();
+                    console.log("✅ Firebase Cloud Connected! ☁️");
+                    document.getElementById('cloudStatus').style.display = 'inline-flex';
+                    // Load from cloud on init
+                    await loadShopsFromCloud();
+                } catch (err) {
+                    console.warn("⚠️ Firebase init failed, using local:", err);
+                    initData();
+                }
+            } else {
+                console.log("⚠️ Firebase not available — using localStorage");
+                initData();
+            }
+        }
+
+        // ✅ LOAD FROM CLOUD (or fallback to localStorage)
+        async function loadShopsFromCloud() {
+            if (!db) { initData(); return; }
+            try {
+                const snapshot = await db.collection(SHOPS_COLLECTION).get();
+                if (!snapshot.empty) {
+                    const shops = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+                    console.log(`✅ Loaded ${shops.length} shops from Cloud! ☁️`);
+                } else {
+                    console.log("ℹ️ Cloud empty — initializing sample data...");
+                    initData();
+                    // Push sample data to cloud
+                    const localShops = getAllShops();
+                    for (const shop of localShops) {
+                        await db.collection(SHOPS_COLLECTION).doc(String(shop.id)).set(shop);
+                    }
+                }
+                updateStats();
+                renderShops();
+            } catch (err) {
+                console.error("❌ Cloud load failed:", err);
+                initData();
+            }
+        }
+
+        // ✅ SAVE SHOP TO CLOUD
+        async function saveShopToCloud(shop, isNew = false) {
+            if (!db) return false;
+            try {
+                const docRef = db.collection(SHOPS_COLLECTION).doc(String(shop.id));
+                await docRef.set(shop);
+                console.log(`✅ Shop ${isNew ? 'created' : 'updated'} in Cloud! ☁️`);
+                return true;
+            } catch (err) {
+                console.error("❌ Cloud save failed:", err);
+                return false;
+            }
+        }
+
+        // ✅ DELETE FROM CLOUD
+        async function deleteShopFromCloud(id) {
+            if (!db) return false;
+            try {
+                await db.collection(SHOPS_COLLECTION).doc(String(id)).delete();
+                console.log("✅ Shop deleted from Cloud! ☁️");
+                return true;
+            } catch (err) {
+                console.error("❌ Cloud delete failed:", err);
+                return false;
+            }
+        }
+
+        // 🔄 LOCAL STORAGE FALLBACK SYSTEM
         function initData() {
             if (!localStorage.getItem(STORAGE_KEY)) {
                 const sampleShops = [
@@ -332,32 +411,34 @@
             }
         }
 
-        // CRUD Operations
         function getAllShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
         function saveAllShops(shops) { localStorage.setItem(STORAGE_KEY, JSON.stringify(shops)); updateStats(); renderShops(); }
         function getShopById(id) { return getAllShops().find(s => s.id === id); }
 
-        function addShop(shop) {
+        async function addShop(shop) {
             const shops = getAllShops();
             shop.id = Date.now();
             shop.createdAt = Date.now();
             shops.unshift(shop);
             saveAllShops(shops);
+            await saveShopToCloud(shop, true);
         }
 
-        function updateShop(id, updates) {
+        async function updateShop(id, updates) {
             const shops = getAllShops().map(s => s.id === id ? { ...s, ...updates } : s);
             saveAllShops(shops);
+            const updated = shops.find(s => s.id === id);
+            await saveShopToCloud(updated, false);
         }
 
-        function deleteShop(id) {
+        async function deleteShop(id) {
             if (!confirm('⚠️ Are you sure you want to delete this shop? This cannot be undone!')) return;
             const shops = getAllShops().filter(s => s.id !== id);
             saveAllShops(shops);
-            showToast('✅ Shop deleted successfully!');
+            await deleteShopFromCloud(id);
+            showToast('✅ Shop deleted successfully! ☁️');
         }
 
-        // Update Stats Cards
         function updateStats() {
             const shops = getAllShops();
             document.getElementById('statTotalShops').textContent = shops.length;
@@ -370,7 +451,6 @@
             document.getElementById('statRevenue').textContent = `KSh ${revenue.toLocaleString()}`;
         }
 
-        // Render Shops Table
         function renderShops() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const shops = getAllShops().filter(s => 
@@ -403,7 +483,6 @@
             return div.innerHTML;
         }
 
-        // Modal Controls
         function openModal(shop = null) {
             document.getElementById('shopModal').classList.add('active');
             document.getElementById('shopForm').reset();
@@ -433,7 +512,7 @@
             if (shop) openModal(shop);
         }
 
-        function saveShop(e) {
+        async function saveShop(e) {
             e.preventDefault();
             const shopData = {
                 name: document.getElementById('shopName').value.trim(),
@@ -447,11 +526,11 @@
             const id = document.getElementById('shopId').value;
             
             if (id) {
-                updateShop(parseInt(id), shopData);
-                showToast('✅ Shop updated successfully!');
+                await updateShop(parseInt(id), shopData);
+                showToast('✅ Shop updated successfully! ☁️');
             } else {
-                addShop(shopData);
-                showToast('✅ New shop created successfully!');
+                await addShop(shopData);
+                showToast('✅ New shop created successfully! ☁️');
             }
             closeModal();
         }
@@ -463,23 +542,19 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Sidebar Toggle
         function toggleSidebar() {
             document.getElementById('sidebarNav').classList.toggle('open');
         }
 
-        // Logout
         function logout() {
             localStorage.removeItem('flammes_admin_authed');
             localStorage.removeItem('flammes_admin_user');
             window.location.href = 'login.html';
         }
 
-        // Initialize on load
+        // Initialize on load — Firebase FIRST, then data!
         document.addEventListener('DOMContentLoaded', () => {
-            initData();
-            updateStats();
-            renderShops();
+            initCloud(); // ☁️ Loads from cloud first!
         });
 
         // Close modal on outside click
