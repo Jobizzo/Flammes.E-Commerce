@@ -1,17 +1,13 @@
-// ==============================================
-// 🔥 FLAMMES E-COMMERCE — FIREBASE CONFIG
-// ==============================================
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDG_03R6hJ66N4RuZep3bZZDSatGlXvlog",
-  authDomain: "flammes-e-commerce.firebaseapp.com",
-  projectId: "flammes-e-commerce",
-  storageBucket: "flammes-e-commerce.firebasestorage.app",
-  messagingSenderId: "1081339702019",
-  appId: "1:1081339702019:web:2f48489ec17785be7b9736"
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-// Initialize Firebase
-if (typeof firebase !== 'undefined') {
-  firebase.initializeApp(FIREBASE_CONFIG);
-  console.log("✅ Firebase connected — Flammes Cloud Active!");
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
+const db = firebase.firestore();
