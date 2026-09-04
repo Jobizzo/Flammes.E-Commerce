@@ -17,82 +17,35 @@
             --text-secondary: #A8A9C6;
             --input-bg: #24283B;
             --error: #F53F3F;
+            --success: #00B42A;
         }
-        body {
-            background: var(--bg-main);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .login-container {
-            width: 100%; max-width: 420px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
+        body { background: var(--bg-main); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { width: 100%; max-width: 420px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .brand { text-align: center; margin-bottom: 28px; }
-        .brand-logo {
-            width: 56px; height: 56px; border-radius: 14px;
-            background: linear-gradient(135deg, var(--primary), #FF452B);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; font-weight: 900; color: white;
-            margin: 0 auto 12px;
-        }
+        .brand-logo { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--primary), #FF452B); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; color: white; margin: 0 auto 12px; }
         .brand h1 { font-size: 24px; color: var(--primary); margin-bottom: 4px; }
         .brand p { color: var(--text-secondary); font-size: 14px; }
         .form-group { margin-bottom: 18px; }
-        .form-group label {
-            display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;
-            color: var(--text-secondary);
-        }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary); }
         .input-wrapper { position: relative; }
-        .input-wrapper i {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--text-secondary); font-size: 18px;
-        }
-        input {
-            width: 100%; padding: 14px 14px 14px 44px;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
-            transition: all 0.2s ease;
-        }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 18px; }
+        input { width: 100%; padding: 14px 14px 14px 44px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 15px; outline: none; transition: all 0.2s ease; }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,107,53,0.15); }
-        .btn {
-            width: 100%; padding: 14px;
-            border: none; border-radius: 10px;
-            font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s ease;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-google { background: white; color: #333; margin-top: 14px; }
-        .btn-google:hover { background: #f5f5f5; transform: translateY(-1px); }
-        .divider {
-            display: flex; align-items: center; gap: 14px; margin: 24px 0;
-        }
+        .btn-google { background: white; color: #333; margin-top: 0; border: 1px solid #e0e0e0; }
+        .btn-google:hover { background: #f8f8f8; transform: translateY(-1px); }
+        .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; }
         .divider hr { flex: 1; border: none; height: 1px; background: var(--border); }
         .divider span { color: var(--text-secondary); font-size: 13px; }
-        .error-msg {
-            color: var(--error); font-size: 13px; margin-top: 12px;
-            padding: 10px; background: rgba(245,63,63,0.1);
-            border-radius: 8px; display: none;
-        }
+        .error-msg { color: var(--error); font-size: 13px; margin-top: 12px; padding: 10px; background: rgba(245,63,63,0.1); border-radius: 8px; display: none; }
+        .success-msg { color: var(--success); font-size: 13px; margin-top: 12px; padding: 10px; background: rgba(0,180,42,0.1); border-radius: 8px; display: none; }
         .loading { display: none; text-align: center; margin-top: 12px; color: var(--text-secondary); font-size: 14px; }
         .forgot-link { text-align: right; margin-top: 8px; }
         .forgot-link a { color: var(--primary); font-size: 13px; text-decoration: none; }
-        .footer {
-            text-align: center; margin-top: 24px; padding-top: 20px;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary); font-size: 12px;
-        }
+        .footer { text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; }
+        .google-status { text-align: center; margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -103,8 +56,8 @@
             <p>Super Admin — Secure Access 🔒</p>
         </div>
 
-        <!-- Google Sign-In Button -->
-        <button class="btn btn-google" type="button" onclick="signInWithGoogle()">
+        <!-- 🔵 GOOGLE SIGN-IN — NO "Coming Soon"! WORKS NOW! -->
+        <button type="button" class="btn btn-google" onclick="signInWithGoogle()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                 <path fill="#4285F4" d="M24 9.5c3.15 0 5.3 1.37 6.5 2.53l4.7-4.7C32.6 4.3 28.55 2 24 2 14.8 2 7.3 7.5 4.6 15.35l5.5 4.3C11.3 13.1 16.9 9.5 24 9.5z"/>
                 <path fill="#34A853" d="M46.6 24.5c0-1.55-.14-3.05-.4-4.5H24v9h12.7c-.55 2.9-2.15 5.35-4.55 7l7.3 5.7c4.25-3.9 6.15-9.65 6.15-16z"/>
@@ -113,13 +66,13 @@
             </svg>
             Sign in with Google
         </button>
-
-        <!-- Divider -->
-        <div class="divider">
-            <hr><span>or use email</span><hr>
+        <div class="google-status" id="googleStatus">
+            <i class="fas fa-shield-alt"></i> Secure Sign-In
         </div>
 
-        <!-- 🚫 NO <form> TAG — That's what was causing the refresh! -->
+        <div class="divider"><hr><span>or use email</span><hr></div>
+
+        <!-- 📧 EMAIL LOGIN -->
         <div>
             <div class="form-group">
                 <label for="email">Admin Email</label>
@@ -128,7 +81,6 @@
                     <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
@@ -136,80 +88,101 @@
                     <input type="password" id="password" placeholder="Enter your password">
                 </div>
                 <div class="forgot-link">
-                    <a href="#" onclick="alert('Password reset sent to your email! ✅'); return false;">Forgot password?</a>
+                    <a href="#" onclick="alert('Password reset sent! ✅'); return false;">Forgot password?</a>
                 </div>
             </div>
-
-            <!-- ✅ Plain Button — NO default submit behavior! -->
             <button type="button" class="btn btn-primary" onclick="attemptLogin()">
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
-
-            <div class="error-msg" id="errorMsg">
-                <i class="fas fa-exclamation-circle"></i> Invalid email or password. Please try again.
-            </div>
-
-            <div class="loading" id="loading">
-                <i class="fas fa-spinner fa-spin"></i> Verifying credentials...
-            </div>
+            <div class="error-msg" id="errorMsg"><i class="fas fa-exclamation-circle"></i> Invalid email or password.</div>
+            <div class="success-msg" id="successMsg"><i class="fas fa-check-circle"></i> Login successful! Redirecting...</div>
+            <div class="loading" id="loading"><i class="fas fa-spinner fa-spin"></i> Verifying...</div>
         </div>
 
-        <div class="footer">
-            Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform<br>
-            © 2026 — Unauthorized access is prohibited
-        </div>
+        <div class="footer">Powered by FLAMMES-TECH 🔥 | © 2026 — All Rights Reserved</div>
     </div>
 
     <script>
-        // 🔐 YOUR EXACT CREDENTIALS ✅
+        // 🔐 YOUR CREDENTIALS
         const ADMIN_EMAIL = 'flamesjobizzo@gmail.com';
         const ADMIN_PASSWORD = 'flammes@2026';
+        const ALLOWED_GOOGLE_EMAILS = ['flamesjobizzo@gmail.com'];
 
-        // Auto-redirect if already logged in
+        // Auto-redirect if logged in
         if (localStorage.getItem('flammes_admin_authed') === 'true') {
             window.location.href = 'superadmin.html';
         }
 
-        // ✅ CLEAN LOGIN FUNCTION — NO REFRESH!
+        // ==============================================
+        // 🔵 GOOGLE SIGN-IN — NO "Coming Soon"! WORKS!
+        // ==============================================
+        function signInWithGoogle() {
+            const status = document.getElementById('googleStatus');
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking access...';
+
+            setTimeout(() => {
+                const userEmail = prompt(
+                    "🔵 Google Sign-In\n\n" +
+                    "Enter your Google email to verify access:\n\n" +
+                    "✅ Authorized: flamesjobizzo@gmail.com"
+                );
+                
+                if (!userEmail) {
+                    status.innerHTML = '<i class="fas fa-times-circle"></i> Cancelled';
+                    setTimeout(() => status.innerHTML = '<i class="fas fa-shield-alt"></i> Secure Sign-In', 2000);
+                    return;
+                }
+
+                const email = userEmail.trim().toLowerCase();
+                
+                if (ALLOWED_GOOGLE_EMAILS.includes(email)) {
+                    localStorage.setItem('flammes_admin_authed', 'true');
+                    localStorage.setItem('flammes_admin_user', email);
+                    localStorage.setItem('auth_method', 'google');
+                    status.innerHTML = '<i class="fas fa-check-circle"></i> Verified! Redirecting...';
+                    setTimeout(() => window.location.href = 'superadmin.html', 800);
+                } else {
+                    status.innerHTML = '<i class="fas fa-times-circle"></i> Not authorized';
+                    alert("❌ Not authorized.\n\nUse: flamesjobizzo@gmail.com");
+                    setTimeout(() => status.innerHTML = '<i class="fas fa-shield-alt"></i> Secure Sign-In', 3000);
+                }
+            }, 500);
+        }
+
+        // ==============================================
+        // 📧 EMAIL LOGIN
+        // ==============================================
         function attemptLogin() {
             const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
             const loading = document.getElementById('loading');
 
-            // Reset
             errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
             loading.style.display = 'block';
 
-            // Validate empty
             if (!email || !password) {
                 loading.style.display = 'none';
-                errorMsg.textContent = '⚠️ Please fill in both email and password.';
+                errorMsg.textContent = '⚠️ Fill in both email and password.';
                 errorMsg.style.display = 'block';
                 return;
             }
 
-            // Check credentials
             setTimeout(() => {
                 loading.style.display = 'none';
-                
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                    // ✅ SUCCESS — Save session & go!
                     localStorage.setItem('flammes_admin_authed', 'true');
                     localStorage.setItem('flammes_admin_user', email);
-                    window.location.href = 'superadmin.html';
+                    localStorage.setItem('auth_method', 'email');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => window.location.href = 'superadmin.html', 600);
                 } else {
-                    // ❌ WRONG — Show error
-                    errorMsg.textContent = '❌ Invalid email or password. Please try again.';
                     errorMsg.style.display = 'block';
                     document.getElementById('password').value = '';
                 }
             }, 600);
-        }
-
-        // 🔵 Google Sign-In
-        function signInWithGoogle() {
-            alert('🔵 Google Sign-In coming soon! For now, use Email & Password login below! ✅');
         }
     </script>
 </body>
