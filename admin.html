@@ -24,11 +24,8 @@
             --sidebar-width: 260px;
             --radius: 12px;
             --radius-lg: 16px;
-            --shadow: 0 4px 20px rgba(0,0,0,0.25);
         }
         body { background: var(--bg-main); color: var(--text-primary); min-height: 100vh; }
-
-        /* ========== SIDEBAR ========== */
         .sidebar {
             position: fixed; top: 0; left: 0; width: 100%; height: auto;
             background: var(--bg-card); border-bottom: 1px solid var(--border);
@@ -67,32 +64,9 @@
             border-left: 3px solid var(--primary);
         }
         .sidebar-nav a.danger { color: var(--danger); }
-        .sidebar-nav a.danger:hover { background: rgba(245,63,63,0.1); }
-
-        /* ========== MAIN CONTENT ========== */
         .main { padding-top: 70px; padding-left: 16px; padding-right: 16px; padding-bottom: 40px; }
-        .top-bar {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-        }
         .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-        .page-title p { color: var(--text-muted); font-size: 14px; }
-        .top-actions { display: flex; gap: 10px; align-items: center; }
-        .btn {
-            padding: 10px 16px; border-radius: 9px; font-size: 14px; font-weight: 600;
-            border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.2s ease;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-        .avatar {
-            width: 38px; height: 38px; border-radius: 50%; background: var(--secondary);
-            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
-        }
-
-        /* ========== STATS CARDS ========== */
+        .page-title p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
         .stats-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px;
         }
@@ -100,11 +74,10 @@
             background: var(--bg-card); border-radius: var(--radius-lg); padding: 18px;
             border: 1px solid var(--border); transition: all 0.25s ease;
         }
-        .stat-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
         .stat-icon {
             width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: white;
+            font-size: 20px; color: white; margin-bottom: 12px;
         }
         .stat-icon.orange { background: linear-gradient(135deg, #FF6B35, #FF452B); }
         .stat-icon.blue { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
@@ -112,11 +85,7 @@
         .stat-icon.purple { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
         .stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
         .stat-value { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
-        .stat-change { font-size: 12px; display: flex; align-items: center; gap: 4px; }
-        .stat-change.up { color: var(--success); }
-        .stat-change.down { color: var(--danger); }
-
-        /* ========== CARDS & TABLES ========== */
+        .stat-change { font-size: 12px; color: var(--success); }
         .card {
             background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px;
             border: 1px solid var(--border); margin-bottom: 20px;
@@ -126,56 +95,34 @@
             margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
         }
         .card-title { font-size: 17px; font-weight: 700; }
-        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        .btn {
+            padding: 10px 16px; border-radius: 9px; font-size: 14px; font-weight: 600;
+            border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-size: 13px; }
         .status {
             display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px;
             border-radius: 20px; font-size: 12px; font-weight: 600;
         }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
         .status-active { background: rgba(0,180,42,0.1); color: var(--success); }
-        .status-active .status-dot { background: var(--success); }
         .status-pending { background: rgba(255,125,0,0.1); color: var(--warning); }
-        .status-pending .status-dot { background: var(--warning); }
-        .status-suspended { background: rgba(245,63,63,0.1); color: var(--danger); }
-        .status-suspended .status-dot { background: var(--danger); }
-        .action-btn { padding: 6px 10px; border-radius: 6px; border: none; background: var(--bg-hover); color: var(--text-primary); font-size: 13px; cursor: pointer; margin-right: 4px; }
-        .action-btn.primary { background: rgba(22,93,255,0.1); color: var(--secondary); }
-        .action-btn.danger { background: rgba(245,63,63,0.1); color: var(--danger); }
-
-        /* ========== QUICK ACTIONS ========== */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-card {
-            background: var(--bg-hover); border-radius: 10px; padding: 16px;
-            text-align: center; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
-        }
-        .action-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .action-card i { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
-        .action-card span { font-size: 13px; font-weight: 600; }
-
-        /* ========== FOOTER ========== */
         .footer {
             text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;
             border-top: 1px solid var(--border); margin-top: 20px;
         }
-
-        /* ========== DESKTOP ADJUSTMENTS ========== */
         @media (min-width: 768px) {
             .sidebar { width: var(--sidebar-width); height: 100vh; flex-direction: column; align-items: flex-start; padding: 20px; border-bottom: none; border-right: 1px solid var(--border); }
             .menu-toggle { display: none; }
             .sidebar-nav { position: static; transform: none; width: 100%; border: none; padding: 0; margin-top: 24px; }
             .main { margin-left: var(--sidebar-width); padding-top: 30px; padding-left: 30px; padding-right: 30px; max-width: 1400px; }
             .stats-grid { grid-template-columns: repeat(4, 1fr); }
-            .actions-grid { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
 <body>
-
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">
             <div class="brand-logo">F</div>
@@ -200,178 +147,89 @@
             <div class="nav-section">
                 <span class="section-label">System</span>
                 <a href="#"><i class="fas fa-history"></i> Audit Logs</a>
-                <a href="#"><i class="fas fa-wrench"></i> Maintenance</a>
+                <a href="#"><i class="fas fa-wrench"></i> Maintenance Mode</a>
                 <a href="#"><i class="fas fa-file-text"></i> Reports</a>
             </div>
             <div class="nav-section" style="margin-top: 40px;">
-                <a href="#" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="#" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </nav>
     </aside>
-
-    <!-- Overlay -->
-    <div id="overlay" onclick="toggleSidebar()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:997;"></div>
-
-    <!-- Main Content -->
     <main class="main">
-        <div class="top-bar">
-            <div class="page-title">
-                <h1>Super Admin Control Center 👑</h1>
-                <p>Full Platform Overview & Management — Flammes E-Commerce</p>
-            </div>
-            <div class="top-actions">
-                <button class="btn btn-outline"><i class="fas fa-bell"></i></button>
-                <div class="avatar">SA</div>
-            </div>
+        <div class="page-title">
+            <h1>Super Admin Control Center 👑</h1>
+            <p>Full Platform Overview — Flammes E-Commerce</p>
         </div>
-
-        <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon orange"><i class="fas fa-store"></i></div>
-                </div>
+                <div class="stat-icon orange"><i class="fas fa-store"></i></div>
                 <div class="stat-label">Total Shops</div>
                 <div class="stat-value">24</div>
-                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 3 new this week</div>
+                <div class="stat-change">↑ 3 new this week</div>
             </div>
             <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon blue"><i class="fas fa-coins"></i></div>
-                </div>
+                <div class="stat-icon blue"><i class="fas fa-coins"></i></div>
                 <div class="stat-label">Monthly Revenue</div>
                 <div class="stat-value">KSh 45,800</div>
-                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 12% vs last month</div>
+                <div class="stat-change">↑ 12% vs last month</div>
             </div>
             <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon green"><i class="fas fa-shopping-cart"></i></div>
-                </div>
+                <div class="stat-icon green"><i class="fas fa-shopping-cart"></i></div>
                 <div class="stat-label">Active Orders</div>
                 <div class="stat-value">156</div>
-                <div class="stat-change up"><i class="fas fa-arrow-up"></i> 24 new today</div>
+                <div class="stat-change">↑ 24 new today</div>
             </div>
             <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-                </div>
+                <div class="stat-icon purple"><i class="fas fa-users"></i></div>
                 <div class="stat-label">Active Agents</div>
                 <div class="stat-value">48</div>
-                <div class="stat-change down"><i class="fas fa-minus"></i> 2 offline</div>
+                <div class="stat-change">⚡ On duty</div>
             </div>
         </div>
-
-        <!-- Shops Management -->
         <div class="card">
             <div class="card-header">
                 <h2 class="card-title">🏪 Recent Shops</h2>
                 <button class="btn btn-primary"><i class="fas fa-plus"></i> Create New Shop</button>
             </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Shop Name</th>
-                            <th>Owner</th>
-                            <th>Plan</th>
-                            <th>Domain</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>TechHub Nairobi</strong></td>
-                            <td>John K.</td>
-                            <td>Pro (KSh 2,500/mo)</td>
-                            <td>techhub.flammes.co.ke</td>
-                            <td><span class="status status-active"><span class="status-dot"></span> Active</span></td>
-                            <td>
-                                <button class="action-btn primary"><i class="fas fa-eye"></i></button>
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn danger"><i class="fas fa-ban"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Fresh Greens Grocery</strong></td>
-                            <td>Sarah M.</td>
-                            <td>Basic (KSh 1,500/mo)</td>
-                            <td>freshgreens.flammes.co.ke</td>
-                            <td><span class="status status-active"><span class="status-dot"></span> Active</span></td>
-                            <td>
-                                <button class="action-btn primary"><i class="fas fa-eye"></i></button>
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn danger"><i class="fas fa-ban"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Style & Fashion</strong></td>
-                            <td>David O.</td>
-                            <td>Pro (KSh 2,500/mo)</td>
-                            <td>style.flammes.co.ke</td>
-                            <td><span class="status status-pending"><span class="status-dot"></span> Pending</span></td>
-                            <td>
-                                <button class="action-btn primary"><i class="fas fa-check"></i></button>
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn danger"><i class="fas fa-times"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>QuickMart Deliveries</strong></td>
-                            <td>Esther W.</td>
-                            <td>Basic (KSh 1,500/mo)</td>
-                            <td>quickmart.flammes.co.ke</td>
-                            <td><span class="status status-suspended"><span class="status-dot"></span> Suspended</span></td>
-                            <td>
-                                <button class="action-btn primary"><i class="fas fa-undo"></i></button>
-                                <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                <button class="action-btn danger"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Shop Name</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>TechHub Nairobi</strong></td>
+                        <td>Pro (KSh 2,500/mo)</td>
+                        <td><span class="status status-active">● Active</span></td>
+                        <td><button class="btn">Manage</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fresh Greens Grocery</strong></td>
+                        <td>Basic (KSh 1,500/mo)</td>
+                        <td><span class="status status-active">● Active</span></td>
+                        <td><button class="btn">Manage</button></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Style & Fashion</strong></td>
+                        <td>Pro (KSh 2,500/mo)</td>
+                        <td><span class="status status-pending">● Pending</span></td>
+                        <td><button class="btn">Manage</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">⚡ Quick Actions</h2>
-            </div>
-            <div class="actions-grid">
-                <div class="action-card">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Send Announcement</span>
-                </div>
-                <div class="action-card">
-                    <i class="fas fa-cog"></i>
-                    <span>Platform Settings</span>
-                </div>
-                <div class="action-card">
-                    <i class="fas fa-file-invoice"></i>
-                    <span>View Reports</span>
-                </div>
-                <div class="action-card">
-                    <i class="fas fa-wrench"></i>
-                    <span>Maintenance Mode</span>
-                </div>
-            </div>
+        <div class="footer">
+            Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform v1.0
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform — Super Admin Control Center</p>
-            <p>v1.0.0 — Built in Nairobi, Kenya 🇰🇷🇰🇪 | All Systems Operational</p>
-        </footer>
     </main>
-
-    <!-- Scripts -->
     <script>
         function toggleSidebar() {
             const nav = document.getElementById('sidebarNav');
-            const overlay = document.getElementById('overlay');
             nav.classList.toggle('open');
-            overlay.style.display = nav.classList.contains('open') ? 'block' : 'none';
         }
     </script>
 </body>
