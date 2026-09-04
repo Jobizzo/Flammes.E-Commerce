@@ -10,7 +10,6 @@
         :root {
             --primary: #FF6B35;
             --primary-dark: #E55A2B;
-            --google-blue: #4285F4;
             --bg-main: #0F111A;
             --bg-card: #1A1D2B;
             --border: #2B2F45;
@@ -18,7 +17,6 @@
             --text-secondary: #A8A9C6;
             --input-bg: #24283B;
             --error: #F53F3F;
-            --divider: #383C52;
         }
         body {
             background: var(--bg-main);
@@ -77,11 +75,10 @@
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-google { background: white; color: #333; margin-top: 14px; }
         .btn-google:hover { background: #f5f5f5; transform: translateY(-1px); }
-        .btn-google img { width: 20px; height: 20px; }
         .divider {
             display: flex; align-items: center; gap: 14px; margin: 24px 0;
         }
-        .divider hr { flex: 1; border: none; height: 1px; background: var(--divider); }
+        .divider hr { flex: 1; border: none; height: 1px; background: var(--border); }
         .divider span { color: var(--text-secondary); font-size: 13px; }
         .error-msg {
             color: var(--error); font-size: 13px; margin-top: 12px;
@@ -107,7 +104,7 @@
         </div>
 
         <!-- Google Sign-In Button -->
-        <button class="btn btn-google" onclick="signInWithGoogle()">
+        <button class="btn btn-google" type="button" onclick="signInWithGoogle()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                 <path fill="#4285F4" d="M24 9.5c3.15 0 5.3 1.37 6.5 2.53l4.7-4.7C32.6 4.3 28.55 2 24 2 14.8 2 7.3 7.5 4.6 15.35l5.5 4.3C11.3 13.1 16.9 9.5 24 9.5z"/>
                 <path fill="#34A853" d="M46.6 24.5c0-1.55-.14-3.05-.4-4.5H24v9h12.7c-.55 2.9-2.15 5.35-4.55 7l7.3 5.7c4.25-3.9 6.15-9.65 6.15-16z"/>
@@ -122,13 +119,13 @@
             <hr><span>or use email</span><hr>
         </div>
 
-        <!-- Email/Password Login Form -->
-        <form id="loginForm">
+        <!-- 🚫 NO <form> TAG — That's what was causing the refresh! -->
+        <div>
             <div class="form-group">
                 <label for="email">Admin Email</label>
                 <div class="input-wrapper">
                     <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" placeholder="your@email.com" required autocomplete="email">
+                    <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
                 </div>
             </div>
 
@@ -136,14 +133,15 @@
                 <label for="password">Password</label>
                 <div class="input-wrapper">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <input type="password" id="password" placeholder="Enter your password">
                 </div>
                 <div class="forgot-link">
                     <a href="#" onclick="alert('Password reset sent to your email! ✅'); return false;">Forgot password?</a>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <!-- ✅ Plain Button — NO default submit behavior! -->
+            <button type="button" class="btn btn-primary" onclick="attemptLogin()">
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
 
@@ -154,7 +152,7 @@
             <div class="loading" id="loading">
                 <i class="fas fa-spinner fa-spin"></i> Verifying credentials...
             </div>
-        </form>
+        </div>
 
         <div class="footer">
             Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform<br>
@@ -163,66 +161,55 @@
     </div>
 
     <script>
-        // 🔐 YOUR ADMIN CREDENTIALS — SET YOUR EMAIL & PASSWORD
-        const ADMIN_EMAIL = 'flamesjobizzo@gmail.com;  // ← YOUR admin email
-        const ADMIN_PASSWORD = 'Flammes@2026';       // ← YOUR secure password
+        // 🔐 YOUR EXACT CREDENTIALS ✅
+        const ADMIN_EMAIL = 'flamesjobizzo@gmail.com';
+        const ADMIN_PASSWORD = 'flammes@2026';
 
-        // Check if already logged in
+        // Auto-redirect if already logged in
         if (localStorage.getItem('flammes_admin_authed') === 'true') {
             window.location.href = 'superadmin.html';
         }
 
-        const loginForm = document.getElementById('loginForm');
-        const errorMsg = document.getElementById('errorMsg');
-        const loading = document.getElementById('loading');
+        // ✅ CLEAN LOGIN FUNCTION — NO REFRESH!
+        function attemptLogin() {
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const loading = document.getElementById('loading');
 
-        // 📧 Email + Password Login
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Reset
             errorMsg.style.display = 'none';
             loading.style.display = 'block';
 
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const password = document.getElementById('password').value;
+            // Validate empty
+            if (!email || !password) {
+                loading.style.display = 'none';
+                errorMsg.textContent = '⚠️ Please fill in both email and password.';
+                errorMsg.style.display = 'block';
+                return;
+            }
 
+            // Check credentials
             setTimeout(() => {
                 loading.style.display = 'none';
                 
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                    // ✅ SUCCESS — Save session & go!
                     localStorage.setItem('flammes_admin_authed', 'true');
                     localStorage.setItem('flammes_admin_user', email);
-                    localStorage.setItem('auth_method', 'email');
                     window.location.href = 'superadmin.html';
                 } else {
+                    // ❌ WRONG — Show error
+                    errorMsg.textContent = '❌ Invalid email or password. Please try again.';
                     errorMsg.style.display = 'block';
                     document.getElementById('password').value = '';
                 }
-            }, 800);
-        });
+            }, 600);
+        }
 
         // 🔵 Google Sign-In
         function signInWithGoogle() {
-            errorMsg.style.display = 'none';
-            loading.style.display = 'block';
-
-            // Simulate Google OAuth flow — in production, integrate Firebase Auth or Google OAuth
-            setTimeout(() => {
-                loading.style.display = 'none';
-                
-                // For demo — show setup instructions
-                const proceed = confirm(
-                    "🔵 Google Sign-In Setup:\n\n" +
-                    "For full Google OAuth integration:\n" +
-                    "1. Go to console.cloud.google.com → Create OAuth Credentials\n" +
-                    "2. Add Authorized JavaScript origins\n" +
-                    "3. Replace this simulation with real Google Auth API\n\n" +
-                    "✅ For now — use Email & Password login below!"
-                );
-                
-                if (proceed) {
-                    document.getElementById('email').focus();
-                }
-            }, 1000);
+            alert('🔵 Google Sign-In coming soon! For now, use Email & Password login below! ✅');
         }
     </script>
 </body>
