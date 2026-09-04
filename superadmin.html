@@ -1,3 +1,11 @@
+<!-- 🔐 ADMIN SESSION PROTECTION -->
+<script>
+(function(){
+    if (localStorage.getItem('flammes_admin_authed') !== 'true') {
+        window.location.href = 'login.html?from=superadmin';
+    }
+})();
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +60,7 @@
         .sidebar-nav .section-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); padding: 0 14px 8px; letter-spacing: 0.5px; }
         .sidebar-nav a {
             display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-            color: var(--text-secondary); text-decoration: none; border-radius: 1px;
+            color: var(--text-secondary); text-decoration: none; border-radius: 8px;
             margin-bottom: 4px; font-size: 14px; font-weight: 500;
             transition: all 0.2s ease;
         }
@@ -97,9 +105,13 @@
         .card-title { font-size: 17px; font-weight: 700; }
         .btn {
             padding: 10px 16px; border-radius: 9px; font-size: 14px; font-weight: 600;
-            border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); }
         th { color: var(--text-muted); font-size: 13px; }
@@ -109,6 +121,39 @@
         }
         .status-active { background: rgba(0,180,42,0.1); color: var(--success); }
         .status-pending { background: rgba(255,125,0,0.1); color: var(--warning); }
+        .status-suspended { background: rgba(245,63,63,0.1); color: var(--danger); }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 18px; font-weight: 700; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .form-row { margin-bottom: 16px; }
+        .form-row label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-secondary); }
+        .form-row input, .form-row select {
+            width: 100%; padding: 12px; background: var(--bg-hover); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text-primary); font-size: 15px; outline: none;
+        }
+        .form-row input:focus, .form-row select:focus { border-color: var(--primary); }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .search-box {
+            width: 100%; padding: 10px 14px; background: var(--bg-hover); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text-primary); font-size: 14px; margin-bottom: 16px;
+        }
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--success); color: white; padding: 14px 24px; border-radius: 10px;
+            font-weight: 600; z-index: 2000; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .toast.show { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
         .footer {
             text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;
             border-top: 1px solid var(--border); margin-top: 20px;
@@ -133,7 +178,7 @@
             <div class="nav-section">
                 <span class="section-label">Core</span>
                 <a href="#" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a>
-                <a href="#"><i class="fas fa-store"></i> All Shops</a>
+                <a href="#" onclick="showTab('shops'); return false;"><i class="fas fa-store"></i> All Shops</a>
                 <a href="#"><i class="fas fa-users"></i> Users & Admins</a>
                 <a href="#"><i class="fas fa-money-bill-wave"></i> Transactions</a>
             </div>
@@ -151,7 +196,7 @@
                 <a href="#"><i class="fas fa-file-text"></i> Reports</a>
             </div>
             <div class="nav-section" style="margin-top: 40px;">
-                <a href="#" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="#" onclick="logout(); return false;" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </nav>
     </aside>
@@ -164,73 +209,283 @@
             <div class="stat-card">
                 <div class="stat-icon orange"><i class="fas fa-store"></i></div>
                 <div class="stat-label">Total Shops</div>
-                <div class="stat-value">24</div>
-                <div class="stat-change">↑ 3 new this week</div>
+                <div class="stat-value" id="statTotalShops">0</div>
+                <div class="stat-change" id="statNewShops">—</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon blue"><i class="fas fa-coins"></i></div>
                 <div class="stat-label">Monthly Revenue</div>
-                <div class="stat-value">KSh 45,800</div>
-                <div class="stat-change">↑ 12% vs last month</div>
+                <div class="stat-value" id="statRevenue">KSh 0</div>
+                <div class="stat-change">↑ vs last month</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon green"><i class="fas fa-shopping-cart"></i></div>
                 <div class="stat-label">Active Orders</div>
-                <div class="stat-value">156</div>
-                <div class="stat-change">↑ 24 new today</div>
+                <div class="stat-value">—</div>
+                <div class="stat-change">Coming Soon</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon purple"><i class="fas fa-users"></i></div>
                 <div class="stat-label">Active Agents</div>
-                <div class="stat-value">48</div>
-                <div class="stat-change">⚡ On duty</div>
+                <div class="stat-value">—</div>
+                <div class="stat-change">Coming Soon</div>
             </div>
         </div>
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">🏪 Recent Shops</h2>
-                <button class="btn btn-primary"><i class="fas fa-plus"></i> Create New Shop</button>
+                <h2 class="card-title">🏪 Shop Management</h2>
+                <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Add New Shop</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Shop Name</th>
-                        <th>Plan</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>TechHub Nairobi</strong></td>
-                        <td>Pro (KSh 2,500/mo)</td>
-                        <td><span class="status status-active">● Active</span></td>
-                        <td><button class="btn">Manage</button></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Fresh Greens Grocery</strong></td>
-                        <td>Basic (KSh 1,500/mo)</td>
-                        <td><span class="status status-active">● Active</span></td>
-                        <td><button class="btn">Manage</button></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Style & Fashion</strong></td>
-                        <td>Pro (KSh 2,500/mo)</td>
-                        <td><span class="status status-pending">● Pending</span></td>
-                        <td><button class="btn">Manage</button></td>
-                    </tr>
-                </tbody>
-            </table>
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search shops by name, owner, or domain..." oninput="renderShops()">
+            <div id="shopsTableContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Shop Name</th>
+                            <th>Owner</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shopsTable">
+                        <!-- Shops load dynamically here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="footer">
-            Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform v1.0
+            Powered by FLAMMES-TECH 🔥 | Flammes E-Commerce Platform v1.1
         </div>
     </main>
+
+    <!-- 📝 ADD/EDIT SHOP MODAL -->
+    <div class="modal-overlay" id="shopModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ Add New Shop</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="shopForm" onsubmit="saveShop(event)">
+                <input type="hidden" id="shopId">
+                <div class="form-row">
+                    <label>Shop Name *</label>
+                    <input type="text" id="shopName" placeholder="e.g. TechHub Nairobi" required>
+                </div>
+                <div class="form-row">
+                    <label>Owner Name *</label>
+                    <input type="text" id="shopOwner" placeholder="Owner full name" required>
+                </div>
+                <div class="form-row">
+                    <label>Email *</label>
+                    <input type="email" id="shopEmail" placeholder="owner@email.com" required>
+                </div>
+                <div class="form-row">
+                    <label>Phone</label>
+                    <input type="tel" id="shopPhone" placeholder="+254 XXX XXX XXX">
+                </div>
+                <div class="form-row">
+                    <label>Plan *</label>
+                    <select id="shopPlan" required>
+                        <option value="">Select Plan</option>
+                        <option value="Basic (KSh 1,500/mo)">Basic — KSh 1,500/mo</option>
+                        <option value="Pro (KSh 2,500/mo)">Pro — KSh 2,500/mo</option>
+                        <option value="Enterprise (KSh 5,000/mo)">Enterprise — KSh 5,000/mo</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Status *</label>
+                    <select id="shopStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Domain</label>
+                    <input type="text" id="shopDomain" placeholder="shop-name.flammes.co.ke">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Shop</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ✅ TOAST NOTIFICATION -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        function toggleSidebar() {
-            const nav = document.getElementById('sidebarNav');
-            nav.classList.toggle('open');
+        // 🔄 DATA MANAGEMENT SYSTEM
+        const STORAGE_KEY = 'flammes_shops_data';
+
+        // Initialize sample data if empty
+        function initData() {
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                const sampleShops = [
+                    { id: Date.now() - 3, name: 'TechHub Nairobi', owner: 'John Kamau', email: 'john@techhub.co.ke', phone: '+254 712 345678', plan: 'Pro (KSh 2,500/mo)', status: 'Active', domain: 'techhub.flammes.co.ke', createdAt: Date.now() - 86400000 * 14 },
+                    { id: Date.now() - 2, name: 'Fresh Greens Grocery', owner: 'Jane Wanjiru', email: 'jane@freshgreens.co.ke', phone: '+254 723 456789', plan: 'Basic (KSh 1,500/mo)', status: 'Active', domain: 'freshgreens.flammes.co.ke', createdAt: Date.now() - 86400000 * 7 },
+                    { id: Date.now() - 1, name: 'Style & Fashion', owner: 'Peter Omondi', email: 'peter@stylefashion.co.ke', phone: '+254 734 567890', plan: 'Pro (KSh 2,500/mo)', status: 'Pending', domain: 'style-fashion.flammes.co.ke', createdAt: Date.now() - 86400000 * 2 }
+                ];
+                saveAllShops(sampleShops);
+            }
         }
+
+        // CRUD Operations
+        function getAllShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+        function saveAllShops(shops) { localStorage.setItem(STORAGE_KEY, JSON.stringify(shops)); updateStats(); renderShops(); }
+        function getShopById(id) { return getAllShops().find(s => s.id === id); }
+
+        function addShop(shop) {
+            const shops = getAllShops();
+            shop.id = Date.now();
+            shop.createdAt = Date.now();
+            shops.unshift(shop);
+            saveAllShops(shops);
+        }
+
+        function updateShop(id, updates) {
+            const shops = getAllShops().map(s => s.id === id ? { ...s, ...updates } : s);
+            saveAllShops(shops);
+        }
+
+        function deleteShop(id) {
+            if (!confirm('⚠️ Are you sure you want to delete this shop? This cannot be undone!')) return;
+            const shops = getAllShops().filter(s => s.id !== id);
+            saveAllShops(shops);
+            showToast('✅ Shop deleted successfully!');
+        }
+
+        // Update Stats Cards
+        function updateStats() {
+            const shops = getAllShops();
+            document.getElementById('statTotalShops').textContent = shops.length;
+            const thisWeek = shops.filter(s => (Date.now() - s.createdAt) < 86400000 * 7).length;
+            document.getElementById('statNewShops').textContent = `↑ ${thisWeek} new this week`;
+            const revenue = shops.reduce((sum, s) => {
+                const m = s.plan.match(/KSh ([\d,]+)/);
+                return sum + (m ? parseInt(m[1].replace(/,/g, '')) : 0);
+            }, 0);
+            document.getElementById('statRevenue').textContent = `KSh ${revenue.toLocaleString()}`;
+        }
+
+        // Render Shops Table
+        function renderShops() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const shops = getAllShops().filter(s => 
+                s.name.toLowerCase().includes(search) || 
+                s.owner.toLowerCase().includes(search) || 
+                (s.domain && s.domain.toLowerCase().includes(search))
+            );
+            const tbody = document.getElementById('shopsTable');
+            tbody.innerHTML = shops.length === 0 ? 
+                `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">
+                    ${search ? '🔍 No shops match your search' : '🏪 No shops yet — click "Add New Shop" to create your first!'}
+                 </td></tr>` :
+                shops.map(s => `
+                    <tr>
+                        <td><strong>${escapeHtml(s.name)}</strong><br><small style="color:var(--text-muted)">${s.domain || '—'}</small></td>
+                        <td>${escapeHtml(s.owner)}<br><small style="color:var(--text-muted)">${escapeHtml(s.email)}</small></td>
+                        <td>${escapeHtml(s.plan)}</td>
+                        <td><span class="status status-${s.status.toLowerCase()}">● ${s.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm" onclick="editShop(${s.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteShop(${s.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Modal Controls
+        function openModal(shop = null) {
+            document.getElementById('shopModal').classList.add('active');
+            document.getElementById('shopForm').reset();
+            document.getElementById('shopId').value = '';
+            document.getElementById('modalTitle').textContent = '➕ Add New Shop';
+            
+            if (shop) {
+                document.getElementById('modalTitle').textContent = '✏️ Edit Shop';
+                document.getElementById('shopId').value = shop.id;
+                document.getElementById('shopName').value = shop.name;
+                document.getElementById('shopOwner').value = shop.owner;
+                document.getElementById('shopEmail').value = shop.email;
+                document.getElementById('shopPhone').value = shop.phone || '';
+                document.getElementById('shopPlan').value = shop.plan;
+                document.getElementById('shopStatus').value = shop.status;
+                document.getElementById('shopDomain').value = shop.domain || '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('shopModal').classList.remove('active');
+            document.getElementById('shopForm').reset();
+        }
+
+        function editShop(id) {
+            const shop = getShopById(id);
+            if (shop) openModal(shop);
+        }
+
+        function saveShop(e) {
+            e.preventDefault();
+            const shopData = {
+                name: document.getElementById('shopName').value.trim(),
+                owner: document.getElementById('shopOwner').value.trim(),
+                email: document.getElementById('shopEmail').value.trim(),
+                phone: document.getElementById('shopPhone').value.trim(),
+                plan: document.getElementById('shopPlan').value,
+                status: document.getElementById('shopStatus').value,
+                domain: document.getElementById('shopDomain').value.trim()
+            };
+            const id = document.getElementById('shopId').value;
+            
+            if (id) {
+                updateShop(parseInt(id), shopData);
+                showToast('✅ Shop updated successfully!');
+            } else {
+                addShop(shopData);
+                showToast('✅ New shop created successfully!');
+            }
+            closeModal();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebarNav').classList.toggle('open');
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('flammes_admin_authed');
+            localStorage.removeItem('flammes_admin_user');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initData();
+            updateStats();
+            renderShops();
+        });
+
+        // Close modal on outside click
+        document.getElementById('shopModal').addEventListener('click', (e) => {
+            if (e.target.id === 'shopModal') closeModal();
+        });
     </script>
 </body>
 </html>
