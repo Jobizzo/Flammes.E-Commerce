@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login — Flammes E-Commerce</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <!-- 🔥 FIREBASE — Loads FIRST -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <!-- ✅ API.JS — Loads RIGHT AFTER Firebase! -->
+    <script src="api.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         :root {
@@ -56,7 +66,7 @@
             <p>Super Admin — Secure Access 🔒</p>
         </div>
 
-        <!-- 🔵 GOOGLE SIGN-IN — NO "Coming Soon"! WORKS NOW! -->
+        <!-- 🔵 GOOGLE SIGN-IN -->
         <button type="button" class="btn btn-google" onclick="signInWithGoogle()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                 <path fill="#4285F4" d="M24 9.5c3.15 0 5.3 1.37 6.5 2.53l4.7-4.7C32.6 4.3 28.55 2 24 2 14.8 2 7.3 7.5 4.6 15.35l5.5 4.3C11.3 13.1 16.9 9.5 24 9.5z"/>
@@ -102,11 +112,6 @@
         <div class="footer">Powered by FLAMMES-TECH 🔥 + Firebase Cloud ☁️ | © 2026 — All Rights Reserved</div>
     </div>
 
-    <!-- 🔥 FIREBASE — Cloud Database Connection → LOADS FIRST! ✅ -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-
     <script>
         // 🔐 YOUR CREDENTIALS
         const ADMIN_EMAIL = 'flamesjobizzo@gmail.com';
@@ -119,7 +124,7 @@
         }
 
         // ==============================================
-        // 🔵 GOOGLE SIGN-IN — NO "Coming Soon"! WORKS!
+        // 🔵 GOOGLE SIGN-IN
         // ==============================================
         function signInWithGoogle() {
             const status = document.getElementById('googleStatus');
