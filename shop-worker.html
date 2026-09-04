@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Worker — Flammes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="api.js"></script>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Roboto,sans-serif;}
+        :root{--primary:#FF6B35;--success:#00B42A;--warning:#FF7D00;--bg-main:#12121F;--bg-card:#1E1E2F;--border:#2D2D44;--text-primary:#FFF;--text-secondary:#A0A0B8;--sidebar-width:240px;--radius:12px;}
+        body{background:var(--bg-main);color:var(--text-primary);min-height:100vh;}
+        .sidebar{position:fixed;top:0;left:0;width:100%;background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;z-index:999;}
+        .brand{display:flex;align-items:center;gap:8px;}
+        .brand-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),#FF452B);display:flex;align-items:center;justify-content:center;font-weight:900;color:white;}
+        .sidebar-nav{position:fixed;top:56px;left:0;width:100%;height:calc(100vh - 56px);background:var(--bg-card);transform:translateX(-100%);transition:.3s;padding:16px;}
+        .sidebar-nav.open{transform:translateX(0);}
+        .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:12px;color:var(--text-secondary);text-decoration:none;border-radius:8px;margin-bottom:4px;}
+        .sidebar-nav a:hover,.sidebar-nav a.active{background:var(--border);color:var(--primary);}
+        .main{padding:70px 16px 30px;}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:20px;border:1px solid var(--border);margin-bottom:16px;}
+        table{width:100%;border-collapse:collapse;font-size:14px;}
+        th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);}
+        th{color:var(--text-secondary);}
+        .btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:600;}
+        .btn-success{background:var(--success);color:white;}
+        .status-pending{background:rgba(255,125,0,0.15);color:var(--warning);padding:3px 8px;border-radius:8px;font-size:12px;}
+        .status-packed{background:rgba(22,93,255,0.15);color:#4285F4;padding:3px 8px;border-radius:8px;font-size:12px;}
+        .status-shipped{background:rgba(0,180,42,0.15);color:var(--success);padding:3px 8px;border-radius:8px;font-size:12px;}
+        .danger{color:#F53F3F;}
+        .restricted-note{background:rgba(255,125,0,0.1);border:1px solid rgba(255,125,0,0.3);border-radius:8px;padding:12px;color:var(--warning);font-size:13px;margin-bottom:20px;}
+        @media(min-width:768px){
+            .sidebar{width:var(--sidebar-width);height:100vh;flex-direction:column;align-items:flex-start;padding:20px;border-bottom:none;border-right:1px solid var(--border);}
+            .menu-toggle{display:none;}
+            .sidebar-nav{position:static;transform:none;width:100%;border:none;padding:0;margin-top:20px;}
+            .main{margin-left:var(--sidebar-width);padding:30px;}
+        }
+    </style>
+</head>
+<body>
+<script>protectRoute('worker');</script>
+
+    <aside class="sidebar">
+        <div class="brand"><div class="brand-logo">F</div><span style="font-weight:800;color:var(--primary)">FLAMMES</span></div>
+        <button class="menu-toggle" onclick="toggleSidebar()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-bars"></i></button>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="#" class="active"><i class="fas fa-list-check"></i> Pending Orders</a>
+            <a href="#"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+            <a href="#"><i class="fas fa-clipboard-check"></i> Fulfillment</a>
+            <a href="#" class="danger" onclick="logout()"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <h1 style="font-size:22px;margin-bottom:6px;">👷 Order Processing</h1>
+        <p style="color:var(--text-secondary);margin-bottom:16px;">Logged in as: <span id="userEmail"></span></p>
+        
+        <div class="restricted-note">
+            <i class="fas fa-lock"></i> Restricted access — Orders & Inventory only. Financial data, settings & promotions are hidden.
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom:16px;">Orders to Process</h3>
+            <table>
+                <thead><tr><th>Order ID</th><th>Item</th><th>Qty</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody><tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:30px;">No pending orders</td></tr></tbody>
+            </table>
+        </div>
+    </main>
+
+<script>initUser();</script>
+</body>
+</html>
